@@ -1,8 +1,10 @@
+import com.OrderClient;
+import com.User;
+import com.UserClient;
+import com.UserGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
-import org.apache.http.HttpStatus;
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +31,7 @@ public class GetOrdersTest {
 
     @After
     public void tearDown(){
-        userClient.delete();
+        userClient.delete(accessToken);
     }
 
     @DisplayName("Check /api/orders - success get orders with auth")

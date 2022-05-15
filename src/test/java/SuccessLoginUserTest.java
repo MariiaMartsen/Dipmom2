@@ -1,3 +1,7 @@
+import com.User;
+import com.UserClient;
+import com.UserCredentials;
+import com.UserGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
@@ -6,11 +10,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class LoginUserTest {
+
+public class SuccessLoginUserTest {
     UserClient userClient;
     User user;
     String accessToken;
@@ -29,27 +33,18 @@ public class LoginUserTest {
     @After
     public void tearDown(){
         userClient.logout(token);
-        userClient.delete();
+        userClient.delete(accessToken);
     }
 
     @DisplayName("Check /api/auth/token - success User Login With Login, Password and Token") //как сделать залогин
     @Test
     public void successUserLoginWithLoginPasswordAndTokenTest() {
-        var cred = new UserCredentials(user.email, user.password, accessToken, token);
+        var cred = new UserCredentials(user.getEmail(), user.getPassword(), accessToken, token);
         ValidatableResponse loginResponse = userClient.login(cred);
         var response = loginResponse.statusCode(200).extract().body();
         assertThat("User cannot be logged in", loginResponse, Matchers.is(notNullValue()));
 
     }
 
-    @DisplayName("Check /api/auth/token - UnSuccess User Login With unCorrect Login, Password and Token") //как сделать залогин
-    @Test
-    public void UnSuccessUserLoginWithLoginPasswordAndTokenTest() {
-        UserCredentials userCredentials = new UserCredentials("test-ssdatga@yandex.ru", "password", "", "");
-        ValidatableResponse createResponse = userClient.login(userCredentials);
-        var response = createResponse.statusCode(401).extract().body();
-        assertThat("User can be logged in with unCorrect Login, Password and Token", response, Matchers.is(notNullValue()));
-
-    }
 
 }

@@ -1,3 +1,6 @@
+import com.User;
+import com.UserClient;
+import com.UserGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
@@ -26,7 +29,7 @@ public class ChangeUserTest {
 
     @After
     public void tearDown(){
-        userClient.delete();
+        userClient.delete(accessToken);
     }
 
     @Test

@@ -1,3 +1,6 @@
+import com.User;
+import com.UserClient;
+import com.UserGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.qameta.allure.junit4.DisplayName;
@@ -10,32 +13,33 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class CreateUserTest {
+public class UnSuccessCreateUserTest {
     UserClient userClient;
+    User user;
+    String accessToken;
+    String token;
 
     @Before
-    public void setUp() {
+    public void setUp() throws JsonProcessingException {
         userClient = new UserClient();
+        user = UserGenerator.getRandomEmailPasswordName();
+        var createdUser =  userClient.create(user);
+        accessToken =  createdUser.extract().path("accessToken");
+        token = createdUser.extract().path("refreshToken");
+
     }
 
     @After
     public void tearDown(){
-        userClient.delete();
+        userClient.logout(token);
+        userClient.delete(accessToken);
     }
 
-    @DisplayName("Check /api/auth/register - success Creating unique User")
-    @Test
-    public void successCreatingUserTest() throws JsonProcessingException {
-        var us = UserGenerator.getRandomEmailPasswordName();
-        ValidatableResponse createResponse = userClient.create(us);
-        var response = createResponse.statusCode(200).extract().body();
-        assertThat("User cannot created", response, is(notNullValue()));
-    }
+
 
     @DisplayName("Check /api/auth/register - UnSuccess Creating with existing User")
     @Test
     public void unSuccessCreatingExistingUserTest() throws JsonProcessingException {
-        User user = new User("test-data@yandex.ru", "password", "Username");
         ValidatableResponse createResponse = userClient.create(user);
         var response = createResponse.statusCode(403).extract().body();
         assertThat("User can be created", response, is(notNullValue()));
@@ -44,9 +48,10 @@ public class CreateUserTest {
     @DisplayName("Check /api/auth/register - UnSuccess Creating User without name")
     @Test
     public void unSuccessCreatingUserWithoutNameTest() throws JsonProcessingException {
-        var us = UserGenerator.getRandomEmailPasswordWithoutName();
-        ValidatableResponse createResponse = userClient.create(us);
+        ValidatableResponse createResponse = userClient.create(user);
         var response = createResponse.statusCode(403).extract().body();
         assertThat("User can be created", response, is(notNullValue()));
     }
 }
+
+
